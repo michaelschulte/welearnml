@@ -3,6 +3,7 @@ library(dplyr)
 library(haven)
 library(psych)
 library(questionr)
+library(tidymodels)
 
 df <- haven::read_sav("data/American_Mind_2008-2018.sav")
 
@@ -23,7 +24,9 @@ df <- df %>%
               . == 1 ~ 0, 
               . == 2 ~ 0, 
               . == 3 ~ 1,
-              . == 4 ~ 1)))
+              . == 4 ~ 1))) %>% 
+  mutate(discuss_GW = as.factor(discuss_GW))
+
 
 # check
 df %>% select(discuss_GW) %>% questionr::freq()
@@ -35,6 +38,12 @@ df <- df %>% select(
   gender, age, generation, educ_category, income_category, race, ideology, party,  region9,
   service_attendance,marit_status,employment,house_size,house_type,house_own)
 
-# save 
-saveRDS(df, file = "data/df.rds")
+# resampling
+df_split <- rsample::initial_split(df, prop = 0.75, strata = discuss_GW)
 
+df_training <- df_split %>% training()
+df_testing <- df_split %>% testing()
+
+# save 
+saveRDS(df_training, file = "data/df_training.rds")
+saveRDS(df_testing, file = "data/df_testing.rds")
