@@ -4,7 +4,7 @@ library(haven)
 library(psych)
 library(questionr)
 
-df <- haven::read_sav("../data/American_Mind_2008-2018.sav")
+df <- haven::read_sav("data/American_Mind_2008-2018.sav")
 
 # clean data, remove unnecessary levels
 df %>% psych::describe()
@@ -36,5 +36,5 @@ df <- df %>% select(
   service_attendance,marit_status,employment,house_size,house_type,house_own)
 
 # save 
-saveRDS(df, file = "../data/df.rds")
+saveRDS(df, file = "data/df.rds")
 
