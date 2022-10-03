@@ -13,7 +13,7 @@ df %>% psych::describe()
 # remove "-1" (refused) and "0" (don't know) level in all 
 df[df == -1] <- NA
 df[df == 0] <- NA
-df %>% psych::describe()
+#df %>% psych::describe()
 
 df %>% select(discuss_GW) %>% questionr::freq()
 
@@ -37,6 +37,16 @@ df <- df %>% select(
   harm_personally,harm_US,harm_dev_countries,harm_future_gen,harm_plants_animals,when_harm_US,
   gender, age, generation, educ_category, income_category, race, ideology, party,  region9,
   service_attendance,marit_status,employment,house_size,house_type,house_own)
+
+df <- 
+df %>%
+  filter(!is.na(discuss_GW))
+
+df %>%
+  select(starts_with('harm')) %>%
+  is.na() %>%
+  tibble() %>% 
+  mutate(sum = rowSums(across(everything())))
 
 # resampling
 df_split <- rsample::initial_split(df, prop = 0.75, strata = discuss_GW)
