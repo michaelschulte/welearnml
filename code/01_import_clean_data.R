@@ -1,9 +1,10 @@
 # open and skim EUROPEAN VALUES STUDY - EVS 2017
-library(dplyr)
-library(haven)
-library(psych)
-library(questionr)
-library(tidymodels)
+
+if (!require("pacman")){
+  install.packages("pacman")
+}
+
+pacman::p_load(dplyr,haven,psych,questionr,tidymodels,readr)
 
 df <- haven::read_sav("data/American_Mind_2008-2018.sav")
 
