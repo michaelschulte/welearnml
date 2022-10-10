@@ -9,7 +9,7 @@ pacman::p_load(dplyr,haven,psych,questionr,tidymodels,readr)
 df <- haven::read_sav("data/American_Mind_2008-2018.sav")
 
 # clean data, remove unnecessary levels
-df %>% psych::describe()
+# df %>% psych::describe()
 
 # remove "-1" (refused) and "0" (don't know) level in all 
 df[df == -1] <- NA
@@ -41,13 +41,16 @@ df <- df %>% select(
 
 df <- 
 df %>%
-  filter(!is.na(discuss_GW))
+  filter(!is.na(discuss_GW)) %>%
+  select(!starts_with('harm_')) %>%
+  filter(!is.na(sci_consensus))
 
+check_na <- 
 df %>%
   select(starts_with('harm')) %>%
   is.na() %>%
   tibble() %>% 
-  mutate(sum = rowSums(across(everything())))
+  mutate(sum = rowSums(across(everything()))) 
 
 # resampling
 df_split <- rsample::initial_split(df, prop = 0.75, strata = discuss_GW)
@@ -58,3 +61,4 @@ df_testing <- df_split %>% testing()
 # save 
 saveRDS(df_training, file = "data/df_training.rds")
 saveRDS(df_testing, file = "data/df_testing.rds")
+write_rds(df, file = 'data/df.rds')

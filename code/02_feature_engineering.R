@@ -2,14 +2,37 @@ library(tidyverse)
 library(parsnip)
 library(tidymodels)
 
-df_training <- readRDS("data/df_training.rds")
-df_testing <- readRDS("data/df_testing.rds")
+#df_training <- readRDS("data/df_training.rds")
+#df_testing <- readRDS("data/df_testing.rds")
+df <- read_rds('data/df.rds')
+
+df_split <- rsample::initial_split(df, prop = 0.75, strata = discuss_GW)
 
 # model specification
 logistic_model <- logistic_reg() %>%
   #set_engine('stan') %>%
   set_engine('glm') %>%
   set_mode('classification')
+
+lm_last_fit <- 
+  logistic_model %>%
+  last_fit(discuss_GW ~ ., split = df_split)
+
+lm_last_fit %>%
+  collect_metrics()
+
+results <- 
+lm_last_fit %>%
+  collect_predictions()
+results
+
+# continue at chapter 2 / slide 15
+
+
+
+########
+# stepwise procedure
+
 
 # fit model 
 lm_fit <- logistic_model %>%
@@ -30,7 +53,6 @@ df_pred_prob <- lm_fit %>%
 
 # many NAs, probably because model returns NA when predictors are NA
 questionr::freq(df_training$discuss_GW)
-questionr::freq(df_predictions)
 
 # add predicted values to dataset 
 df_test_results <- df_testing %>%
@@ -39,5 +61,3 @@ df_test_results <- df_testing %>%
 
 # evaluate model performance
 sum(is.na(df_test_results$.pred_class))
-
-
