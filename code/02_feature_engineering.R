@@ -23,7 +23,7 @@ lm_last_fit %>%
   collect_predictions()
 
 custom_metrics <-
-  metric_set(accuracy, sens, spec, roc_auc)
+  metric_set(accuracy, sens) #, spec, roc_auc)
 
 custom_metrics(results, 
                truth = discuss_GW, 

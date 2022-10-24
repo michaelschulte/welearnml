@@ -36,8 +36,9 @@ df %>% select(discuss_GW) %>% questionr::freq()
 df <- df %>% select(
   discuss_GW, wave,happening,cause_original,sci_consensus,worry,
   #harm_personally,harm_US,harm_dev_countries,harm_future_gen,harm_plants_animals,when_harm_US,
-  hear_GW_media,gender, age, generation, educ_category, income_category, race, ideology, party,  region9,
+  gender, age, generation, educ_category, income_category, race, ideology, party,  region9,
   service_attendance,marit_status,employment,house_size,house_type,house_own)
+
 
 df <- 
 df %>%
