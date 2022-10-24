@@ -18,17 +18,43 @@ lm_last_fit <-
   logistic_model %>%
   last_fit(discuss_GW ~ ., split = df_split)
 
-lm_last_fit %>%
-  collect_metrics()
-
 results <- 
 lm_last_fit %>%
   collect_predictions()
-results
 
-# continue at chapter 2 / slide 15
+custom_metrics <-
+  metric_set(accuracy, sens, spec, roc_auc)
 
+custom_metrics(results, 
+               truth = discuss_GW, 
+               estimate = .pred_class)
 
+conf_mat(results, 
+               truth = discuss_GW, 
+               estimate = .pred_class) %>%
+  autoplot(type = 'heatmap')
+
+results %>%
+roc_curve(truth = discuss_GW,
+          .pred_0) %>%
+  autoplot()
+
+results %>%
+  roc_auc(truth = discuss_GW,
+            .pred_0)
+
+custom_metrics(results,
+               truth = discuss_GW,
+               estimate = .pred_class,
+               .pred_0)
+
+discuss <- recipe(discuss_GW ~ ., 
+                  df) %>%
+  step_log()
+
+sum_variables <-
+discuss %>%
+  summary()
 
 ########
 # stepwise procedure
@@ -61,3 +87,4 @@ df_test_results <- df_testing %>%
 
 # evaluate model performance
 sum(is.na(df_test_results$.pred_class))
+
