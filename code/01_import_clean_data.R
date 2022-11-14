@@ -35,9 +35,10 @@ df %>% select(discuss_GW) %>% questionr::freq()
 # reduce to most interesting variables
 df <- df %>% select(
   discuss_GW, wave,happening,cause_original,sci_consensus,worry,
-  harm_personally,harm_US,harm_dev_countries,harm_future_gen,harm_plants_animals,when_harm_US,
+  #harm_personally,harm_US,harm_dev_countries,harm_future_gen,harm_plants_animals,when_harm_US,
   gender, age, generation, educ_category, income_category, race, ideology, party,  region9,
   service_attendance,marit_status,employment,house_size,house_type,house_own)
+
 
 df <- 
 df %>%
@@ -51,6 +52,39 @@ df %>%
   is.na() %>%
   tibble() %>% 
   mutate(sum = rowSums(across(everything()))) 
+
+
+table(df$happening)
+df <- 
+  df %>%
+  mutate(happening = case_when(
+    happening < 3 ~ 1,
+    happening == 3 ~ 2))
+
+
+table(df$cause_original)
+df <-
+  df %>%
+  mutate(cause_original = case_when(
+    cause_original == 1 ~ 1,
+    cause_original == 2 ~ 2,
+    cause_original == 3 ~ 2,
+    cause_original == 4 ~ 2
+    ))
+
+
+
+table(df$sci_consensus)
+df <- df %>% mutate(sci_consensus = case_when(
+  sci_consensus == 4 ~ 2,
+  sci_consensus != 4 ~ 1
+))
+
+
+
+
+
+
 
 # resampling
 df_split <- rsample::initial_split(df, prop = 0.75, strata = discuss_GW)
