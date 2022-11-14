@@ -34,10 +34,10 @@ df %>% select(discuss_GW) %>% questionr::freq()
 
 # reduce to most interesting variables
 df <- df %>% select(
-  discuss_GW, wave,happening,cause_original,sci_consensus,worry,
-  #harm_personally,harm_US,harm_dev_countries,harm_future_gen,harm_plants_animals,when_harm_US,
-  gender, age, generation, educ_category, income_category, race, ideology, party,  region9,
-  service_attendance,marit_status,employment,house_size,house_type,house_own)
+  discuss_GW, happening,cause_original,sci_consensus,worry,
+  #harm_personally,harm_US,harm_dev_countries,harm_future_gen,harm_plants_animals,when_harm_US, generation, 
+  gender, age, educ_category, income_category, race, ideology, party,  region4,
+  marit_status,employment,house_size,house_own)
 
 
 df <- 
@@ -81,8 +81,59 @@ df <- df %>% mutate(sci_consensus = case_when(
 ))
 
 
+# race as factor
+df <- df %>%
+  mutate(race = as.factor(race))
+
+# recode party
+df <- 
+  df %>%
+  mutate_at(vars(party),
+            ~(party = case_when(
+              . == 1 ~ 1, 
+              . == 2 ~ 2, 
+              . == 3 ~ 3,
+              TRUE ~ NA_real_))) %>% 
+  mutate(party = as.factor(party))
 
 
+# recode region
+df <- df %>%
+  mutate(region4 = as.factor(region4))
+
+# recode relationship status
+df <- 
+  df %>%
+  mutate_at(vars(marit_status),
+            ~(marit_status = case_when(
+              . == 1 ~ 1, 
+              . == 2 ~ 0, 
+              . == 3 ~ 0,
+              . == 4 ~ 0,
+              . == 5 ~ 0,
+              . == 6 ~ 1,
+              TRUE ~ NA_real_))) %>% 
+  mutate(marit_status = as.factor(marit_status))
+
+questionr::freq(df$marit_status)
+
+
+# recode employment
+df <- 
+  df %>%
+  mutate_at(vars(employment),
+            ~(employment = case_when(
+              . < 3 ~ 1, 
+              . > 2 ~ 0,
+              TRUE ~ NA_real_))) %>% 
+  mutate(employment = as.factor(employment))
+
+
+
+# recode region
+df <- df %>%
+  mutate(house_own = as.factor(house_own))
+questionr::freq(df$house_own)
 
 
 

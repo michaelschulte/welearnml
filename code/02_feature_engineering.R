@@ -23,11 +23,8 @@ lm_last_fit %>%
   collect_predictions()
 
 custom_metrics <-
-<<<<<<< HEAD
-  metric_set(accuracy, sens, spec)
-=======
   metric_set(accuracy, sens) #, spec, roc_auc)
->>>>>>> 3857fcd23d4e8629085eb1f8aa33f18207e7d75c
+
 
 custom_metrics(results, 
                truth = discuss_GW, 
@@ -59,6 +56,15 @@ discuss <- recipe(discuss_GW ~ .,
 sum_variables <-
 discuss %>%
   summary()
+
+
+
+
+
+
+
+
+
 
 ########
 # stepwise procedure
