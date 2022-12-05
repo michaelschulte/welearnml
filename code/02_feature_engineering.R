@@ -49,17 +49,80 @@ custom_metrics(results,
                estimate = .pred_class,
                .pred_0)
 
-discuss <- recipe(discuss_GW ~ ., 
+
+
+
+
+
+
+
+
+
+
+# so far we stopped here, no recipes used
+
+# old version without creating dummies
+discuss_recipe <- recipe(discuss_GW ~ ., 
                   df) %>%
+  # do we need next line 
   step_log()
 
 sum_variables <-
-discuss %>%
+  discuss_recipe %>%
   summary()
 
+discuss_recipe %>% 
+  prep() %>% 
+  bake(new_data = NULL) %>% 
+  #select(starts_with("city")) %>%
+  names() # level "anything" is the reference level
+
+# create workflow
+discuss_wkfl <- workflow() %>% 
+  add_model(logistic_model) %>% 
+  add_recipe(discuss_recipe)
+
+# run workflow
+discuss_wkfl_fit <- discuss_wkfl %>% 
+  last_fit(split = df_split)
+
+discuss_wkfl_fit %>% 
+  collect_metrics()
 
 
 
+
+# new version with  dummies
+discuss_recipe_dummies <- recipe(discuss_GW ~ ., 
+                  df) %>%
+  # TODO next 3 lines are new
+  step_corr(all_numeric(), threshold = 0.9) %>%
+  step_normalize(all_numeric()) %>%
+  step_dummy(all_nominal(),all_factor(), -all_outcomes()) %>% 
+# do we need next line
+step_log()
+
+sum_variables <-
+  discuss_recipe_dummies %>%
+  summary()
+
+discuss_recipe_dummies %>% 
+  prep() %>% 
+  bake(new_data = NULL) %>% 
+  #select(starts_with("city")) %>%
+  names() # level "anything" is the reference level
+
+# create workflow
+discuss_wkfl_dummies <- workflow() %>% 
+  add_model(logistic_model) %>% 
+  add_recipe(discuss_recipe_dummies)
+
+# run workflow
+discuss_wkfl_fit_dummies <- discuss_wkfl_dummies %>% 
+  last_fit(split = df_split)
+
+discuss_wkfl_fit_dummies %>% 
+  collect_metrics()
 
 
 
