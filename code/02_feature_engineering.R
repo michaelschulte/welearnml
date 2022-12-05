@@ -96,7 +96,7 @@ discuss_wkfl_fit %>%
 discuss_recipe_dummies <- recipe(discuss_GW ~ ., 
                   df) %>%
   # TODO next 3 lines are new
-  step_corr(all_numeric(), threshold = 0.9) %>%
+  step_corr(all_numeric(), threshold = 0.8) %>%
   step_normalize(all_numeric()) %>%
   step_dummy(all_nominal(),all_factor(), -all_outcomes()) %>% 
 # do we need next line
@@ -125,6 +125,51 @@ discuss_wkfl_fit_dummies %>%
   collect_metrics()
 
 
+# hyperparameter tuning
+dt_tune_model <- decision_tree(cost_complexity = tune(),
+                               tree_depth = tune (),
+                               min_n = tune ()) %>% 
+  set_engine('rpart') %>%
+  set_mode('classification')
+  
+dt_tune_model
+
+discussion_tune_wkfl <- discuss_wkfl_dummies %>% 
+  update_model(dt_tune_model)
+
+discussion_tune_wkfl
+
+set.seed(214)
+dt_grid <- grid_random(parameters(discussion_tune_wkfl),
+            size = 5)
+
+
+discussion_folds <- vfold_cv(df, # should this only be training data? "df_training"
+                            v = 10,
+                            strata = discuss_GW)
+
+dt_tuning <- discussion_tune_wkfl %>% 
+  tune_grid(resamples = discussion_folds, 
+            grid = dt_grid,
+            metrics = custom_metrics) # maybe need to use different metrics
+
+
+
+dt_tuning %>% 
+  collect_metrics()
+
+
+dt_tuning %>% 
+  show_best()
+
+
+# TODO 
+# check if only training data should be used in tuning (probably yes)
+# add more metrics
+# find out what exactly the tuning process did and how we can interpret the findings
+# would this also work with other model than decision tree?
+# what is the difference between glm and rpart? 
+# do predictions with test data
 
 
 
